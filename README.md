@@ -1,2 +1,4 @@
 # bucket_tasks_docker
-A Docker container that can uses the the Python GCP API to run generic tasks against a GCP Cloud Storage Buckets.
+
+A Docker container for running generic upload/download tasks against GCP Cloud Storage
+

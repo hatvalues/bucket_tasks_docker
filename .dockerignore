@@ -1,0 +1,18 @@
+**savedhtml
+**logs
+**twistd.pid
+**dbs
+**.scrapy
+filescrapy/twistd.pid
+filescrapy/filescrapy/authconfig.py
+filescrapy/dbs
+filescrapy/logs
+senv
+stats.json
+logs
+httpcache
+venv
+
+# prevent file locks if RStudio open
+.Rproj.user
+*.R

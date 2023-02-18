@@ -1,0 +1,51 @@
+# build
+sudo docker build . -t dataproc:latest
+
+# For running the containers:
+
+# NOTE: this line:
+# --volume $HVSNDBOXDSSVC:/credentials.json:ro \
+# the environment variable PREPKEY is...
+# a string literal of the full path to the system account private key on the host machine
+# You may have a different way to implement secure credentials...
+# just make sure that the actual key is never copied into the docker image.
+
+# NOTE: the volumes set up e.g. this line:
+#  --volume "$(pwd)":/usr/src/app \
+# is there to make dev easier because don't have to build after changes
+# but should not be included when performing final stage (preprod) testing
+
+# LINUX
+# use sudo if local Docker folder not writable by current user
+
+docker build . -t bktasks:latest
+
+sudo docker run --rm -p 6700:6800 --name bktasks \
+  --env DATASTORE_PROJECT_ID=hatvalues-sandbox \
+  --env DATASTORE_DATASET=hatvalues-sandbox \
+  --volume $HVSNDBOXBKSVC:/credentials.json:ro \
+  --env GOOGLE_APPLICATION_CREDENTIALS=/credentials.json \
+  --env BUCKET_NAME=data-ingest-bk \
+  --env LOGGING_BUCKET_NAME=data-ingest-bk/bktasks-logging \
+  --env LOG_LOCATION=logs \
+  --volume "$(pwd)":/usr/src/app \
+  --volume "$(pwd)/logs":/usr/src/app/logs \
+  --volume "$(pwd)/files":/usr/src/app/files \  
+  bktasks:latest
+
+# WINDOWS
+
+docker build . -t bktasks:latest
+
+docker run -it --rm -p 6700:6800 --name bktasks ^
+--env DATASTORE_PROJECT_ID=hatvalues-sandbox ^
+--env DATASTORE_DATASET=hatvalues-sandbox ^
+--volume %HVSNDBOXBKSVC%:/credentials.json:ro ^
+--env GOOGLE_APPLICATION_CREDENTIALS=/credentials.json ^
+--env BUCKET_NAME=data-ingest-bk ^
+--env LOGGING_BUCKET_NAME=data-ingest-bk/logging-bktasks ^
+--env LOG_LOCATION=logs ^
+--volume %CD%:/usr/src/app ^
+--volume %CD%/logs:/usr/src/app/logs ^
+--volume %CD%/files:/usr/src/app/files ^
+bktasks:latest
