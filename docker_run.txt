@@ -26,7 +26,7 @@ sudo docker run --rm -p 6700:6800 --name bktasks \
   --volume $HVSNDBOXBKSVC:/credentials.json:ro \
   --env GOOGLE_APPLICATION_CREDENTIALS=/credentials.json \
   --env BUCKET_NAME=data-ingest-bk \
-  --env LOGGING_BUCKET_NAME=data-ingest-bk/bktasks-logging \
+  --env LOGGING_BUCKET_NAME=logging-bktasks \
   --env LOG_LOCATION=logs \
   --volume "$(pwd)":/usr/src/app \
   --volume "$(pwd)/logs":/usr/src/app/logs \
@@ -37,14 +37,14 @@ sudo docker run --rm -p 6700:6800 --name bktasks \
 
 docker build . -t bktasks:latest
 
-docker run -it --rm -p 6700:6800 --name bktasks ^
+docker run -it --rm --name bktasks ^
 --env DATASTORE_PROJECT_ID=hatvalues-sandbox ^
 --env DATASTORE_DATASET=hatvalues-sandbox ^
 --volume %HVSNDBOXBKSVC%:/credentials.json:ro ^
 --env GOOGLE_APPLICATION_CREDENTIALS=/credentials.json ^
 --env BUCKET_NAME=data-ingest-bk ^
---env LOGGING_BUCKET_NAME=data-ingest-bk/logging-bktasks ^
---env LOG_LOCATION=logs ^
+--env LOGGING_BUCKET_NAME=logging-bktasks ^
+--env LOGGING_LOCAL=logs ^
 --volume %CD%:/usr/src/app ^
 --volume %CD%/logs:/usr/src/app/logs ^
 --volume %CD%/files:/usr/src/app/files ^
