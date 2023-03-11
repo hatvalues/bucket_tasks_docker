@@ -16,6 +16,7 @@ arg_parser.add_argument("-f", "--file-name", required=True, help="File or folder
 arg_parser.add_argument("-b", "--bucket", default=BUCKET_NAME, help="Destination bucket")
 arg_parser.add_argument("-d", "--destination-folder", default="/")
 arg_parser.add_argument("-g", "--logging-bucket", default=LOGGING_BUCKET_NAME, help="Logging bucket")
+arg_parser.add_argument("-p", "--preview", action="store_true", help="Preview file destinations")
 arg_parser.add_argument(
     "-c", "--clear-log",
     action="store_true",
@@ -88,13 +89,14 @@ if path.is_file():
             "data" : args.file_name
         }
     lg.lp_info(f'Uploading data from source {args.file_name} to destination {file_destination}')
-    upload_(
-        blob_name_(file_destination, args.batch_id, file_type),
-        source_object=source_object,
-        bucket_name=args.bucket
-    )
-    lg.lp_info(f'Uploading common log')
-    common_log_("bucket_upload", f'{args.file_name} as {file_type}')
+    if not args.preview:
+        upload_(
+            blob_name_(file_destination, args.batch_id, file_type),
+            source_object=source_object,
+            bucket_name=args.bucket
+        )
+        lg.lp_info(f'Uploading common log')
+        common_log_("bucket_upload", f'{args.file_name} as {file_type}')
 elif path.is_dir(): # folder
     lg.lp_info(f'Scanning contents of directory {args.file_name}')
     for p in path.rglob("*"):
@@ -107,13 +109,15 @@ elif path.is_dir(): # folder
             "data" : child_source_path
         }
         lg.lp_info(f'Uploading {child_source_path} to {child_destination_path}')
-        upload_(
-            f'{destination_folder}{child_destination_path}',
-            source_object=source_object,
-            bucket_name=args.bucket
-        )
-    lg.lp_info(f'Uploading common log')
-    common_log_("bucket_upload", f'Uploaded all files from path walk at {args.file_name}')        
+        if not args.preview:
+            upload_(
+                child_destination_path,
+                source_object=source_object,
+                bucket_name=args.bucket
+            )
+    if not args.preview:
+        lg.lp_info(f'Uploading common log')
+        common_log_("bucket_upload", f'Uploaded all files from path walk at {args.file_name}')        
 else: # not valid?
     lg.lp_error(f'{FileNotFoundError(args.file_name)}')
 

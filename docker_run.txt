@@ -1,6 +1,3 @@
-# build
-sudo docker build . -t dataproc:latest
-
 # For running the containers:
 
 # NOTE: this line:
