@@ -25,4 +25,3 @@ def preproc_csv(file_name : str, header_row=0):
         return data
     else: # no headers
         pass
-

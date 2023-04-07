@@ -1,15 +1,16 @@
 beautifulsoup4==4.11.1
-google-api-core==1.23.0
-google-auth==1.23.0
+google-api-core==1.34.0
+google-auth==1.35.0
 google-cloud-core==1.4.3
+google-cloud-dataflow-client==0.8.3
 google-cloud-storage==1.33.0
 google-crc32c==1.0.0
 google-resumable-media==1.1.0
-googleapis-common-protos==1.52.0
+googleapis-common-protos==1.59.0
 logparser @ git+https://github.com/my8100/logparser.git@ed7948b271884af68eb3bb13fa9ee51a4892552c
 lxml==4.6.1
 Pillow==8.0.1
-protobuf==3.14.0
+protobuf==3.20.3
 PyYAML==5.3.1
 Scrapy==2.4.1
 scrapyd==1.2.1

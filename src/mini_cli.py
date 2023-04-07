@@ -1,0 +1,50 @@
+from standard_logging import StandardLogger
+import argparse
+import sys
+
+def mini(args):
+    lg = StandardLogger(arg_parser.prog)
+    if args.clear_log:
+        lg.clear_log()
+    lg.lp_info("LOGGER OPENED")
+    try:
+        if args.raise_ex:
+            raise(Exception)
+        print(args.message)
+    except Exception:
+        lg.lp_error(f'Exception was raised')
+        sys.exit()
+
+    lg.lp_info(f'STILL LOGGING')
+
+arg_parser = argparse.ArgumentParser(
+    prog = "MiniCli",
+    description = "Hello World! for this project.",
+    epilog = "See Also mini_cli -h"
+)
+arg_parser.add_argument(
+    "v", "--version",
+    action='version',
+    version='1.0.0'
+)
+arg_parser.add_argument(
+    "-m", "--message",
+    required=True,
+    help="Provide a message to be printed to screen."
+)
+arg_parser.add_argument(
+    "-e", "--raise-ex",
+    action="store_true",
+    help="Try raising an error to see what happens."
+)
+arg_parser.add_argument(
+    "-c", "--clear-log",
+    action="store_true",
+    help="Clear previous log?"
+)
+
+arg_parser.set_defaults(func=mini)
+
+if __name__=="__main__":
+    args = arg_parser.parse_args()
+    args.func(args)

@@ -1,17 +1,10 @@
-**savedhtml
-**logs
-**twistd.pid
-**dbs
-**.scrapy
-filescrapy/twistd.pid
-filescrapy/filescrapy/authconfig.py
-filescrapy/dbs
-filescrapy/logs
-senv
-stats.json
-logs
-httpcache
-venv
+*/env*
+*/venv*
+*/temp*
+archive
+logs/*
+**/*.pickle
+.gitignore
 
 # prevent file locks if RStudio open
 .Rproj.user
