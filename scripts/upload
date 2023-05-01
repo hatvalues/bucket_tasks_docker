@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 
-import helpers.env as env
+from decouple import config
 import helpers.bucket_utilities as bu
 import helpers.file_utilities as fu
 from pathlib import Path
@@ -8,9 +8,12 @@ import argparse
 import sys
 import json
 
+BUCKET_NAME = config("BUCKET_NAME", default="data-ingest-bk")
+LOGGING_BUCKET_NAME = config("LOGGING_BUCKET_NAME", default="logging-bktasks")
+
 def bucket_upload(args):
 
-    lg = fu.StandardLogger(arg_parser.prog)
+    lg = fu.StandardLogger.get_instance(arg_parser.prog)
     if args.clear_log:
         lg.clear_log()
     lg.lp_info("LOGGER OPENED")
@@ -31,7 +34,7 @@ def bucket_upload(args):
         return destination_folder
     
     def preview_or_action(preview: bool, source, destination, **action) -> None:
-        lg.lp_info(f'From source {source} to destination {env.BUCKET_NAME}/{destination}')
+        lg.lp_info(f'From source {source} to destination {BUCKET_NAME}/{destination}')
         if preview:
             lg.lp_info(f'Preview only. No files uploaded.')
         else:
@@ -112,9 +115,9 @@ arg_parser = argparse.ArgumentParser(
     epilog = "See Also bucket_downLoad -h"
 )
 arg_parser.add_argument("-f", "--file-name", required=True, help="File or folder to upload. Supported types: csv, json, txt")
-arg_parser.add_argument("-b", "--bucket", default=env.BUCKET_NAME, help="Destination bucket")
+arg_parser.add_argument("-b", "--bucket", default=BUCKET_NAME, help="Destination bucket")
 arg_parser.add_argument("-d", "--destination-folder", default="/")
-arg_parser.add_argument("-g", "--logging-bucket", default=env.LOGGING_BUCKET_NAME, help="Logging bucket")
+arg_parser.add_argument("-g", "--logging-bucket", default=LOGGING_BUCKET_NAME, help="Logging bucket")
 arg_parser.add_argument("-p", "--preview", action="store_true", help="Preview file destinations")
 arg_parser.add_argument(
     "-v", "--version",

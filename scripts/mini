@@ -1,11 +1,11 @@
 #!/usr/local/bin/python3
 
-import helpers.file_utilities as utils
+import helpers.file_utilities as fu
 import argparse
 import sys
 
 def mini(args):
-    lg = utils.StandardLogger(arg_parser.prog)
+    lg = fu.StandardLogger.get_instance(arg_parser.prog)
     if args.clear_log:
         lg.clear_log()
     lg.lp_info("LOGGER OPENED")

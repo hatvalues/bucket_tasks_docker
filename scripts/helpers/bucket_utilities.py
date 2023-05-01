@@ -1,6 +1,9 @@
+from decouple import config
 from datetime import datetime
-import helpers.env as env
 from google.cloud import storage
+
+BUCKET_NAME = config("BUCKET_NAME", default="data-ingest-bk")
+LOGGING_BUCKET_NAME = config("LOGGING_BUCKET_NAME", default="logging-bktasks")
 
 storage_client = storage.Client()
 
@@ -38,7 +41,7 @@ def bucket_meta(bucket_name):
 def blob_name_(task_name : str, batch_id : int, file_type="json"):
     return f'{task_name}/{datetime.utcnow().isoformat()}/{batch_id}.{file_type}'
 
-def upload_(destination_blob_name : str, source_object : dict, bucket_name=env.BUCKET_NAME):
+def upload_(destination_blob_name : str, source_object : dict, bucket_name=BUCKET_NAME):
     """Uploads object to the bucket.
     
     Parameters
@@ -76,5 +79,5 @@ def common_log_(module, source_object_name):
     upload_(
         blob_name_(module, "common", "log"),
         source_object={"type" : "string", "data" : f'Uploaded {source_object_name}'},
-        bucket_name=env.LOGGING_BUCKET_NAME
+        bucket_name=LOGGING_BUCKET_NAME
     )

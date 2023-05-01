@@ -9,7 +9,7 @@
 #  --volume "$(pwd)":/usr/src/app \
 # is there to make dev easier because don't have to build after changes
 
-# LINUX
+# LINUX / MacOS
 # use sudo if local Docker folder not writable by current user
 
 docker build . -t bktasks:latest
@@ -22,7 +22,8 @@ docker run -it --rm --name bktasks \
   --env BUCKET_NAME=data-ingest-bk \
   --env LOGGING_BUCKET_NAME=logging-bktasks \
   --volume "$(pwd)":/usr/src/app \
-  --volume "$(pwd)/src":/usr/src/app/src \
+  --volume "$(pwd)/scripts":/usr/src/app/scripts \
+  --volume "$(pwd)/scripts/helpers":/usr/src/app/scripts/helpers \
   --volume "$(pwd)/logs":/tmp \
   --volume "$(pwd)/data":/usr/src/app/data \
   bktasks:latest
