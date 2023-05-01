@@ -1,7 +1,8 @@
-from env import BUCKET_NAME, LOGGING_BUCKET_NAME
-from standard_logging import StandardLogger
-from bucket_utilities import upload_, blob_name_, common_log_
-from file_utilities import preproc_csv
+#!/usr/local/bin/python3
+
+import helpers.env as env
+import helpers.bucket_utilities as bu
+import helpers.file_utilities as fu
 from pathlib import Path
 import argparse
 import sys
@@ -9,7 +10,7 @@ import json
 
 def bucket_upload(args):
 
-    lg = StandardLogger(arg_parser.prog)
+    lg = fu.StandardLogger(arg_parser.prog)
     if args.clear_log:
         lg.clear_log()
     lg.lp_info("LOGGER OPENED")
@@ -28,6 +29,21 @@ def bucket_upload(args):
         elif destination_folder[-1]!="/":
             destination_folder += "/"
         return destination_folder
+    
+    def preview_or_action(preview: bool, source, destination, **action) -> None:
+        lg.lp_info(f'From source {source} to destination {env.BUCKET_NAME}/{destination}')
+        if preview:
+            lg.lp_info(f'Preview only. No files uploaded.')
+        else:
+            lg.lp_info(f'Uploading files.')
+            bu.upload_(
+                destination_blob_name=action['destination_blob_name'],
+                source_object=action['source_object'],
+                bucket_name=action['bucket_name']
+                )
+            if action['common_log']:
+                lg.lp_info(f'Uploading common log')
+                bu.common_log_("bucket_upload", f'{args.file_name} as {file_type}')
 
     if not (path.is_file() or path.is_dir()):
         lg.lp_error(f'INVALID FILE: -f/--file-name {args.file_name}')
@@ -41,7 +57,7 @@ def bucket_upload(args):
             lg.lp_info(f'Converting {file_type} to json')
             if file_type=="csv":
                 # TODO: no header row
-                data = preproc_csv(args.file_name, header_row)
+                data = fu.preproc_csv(args.file_name, header_row)
             source_object = {
                 "type" : "string",
                 "data" : json.dumps(data)
@@ -52,15 +68,15 @@ def bucket_upload(args):
                 "type" : "file",
                 "data" : args.file_name
             }
-        lg.lp_info(f'Uploading data from source {args.file_name} to destination {file_destination}')
-        if not args.preview:
-            upload_(
-                blob_name_(file_destination, args.batch_id, file_type),
-                source_object=source_object,
-                bucket_name=args.bucket
+        preview_or_action(
+            preview=args.preview,
+            source=args.file_name,
+            destination=file_destination,
+            destination_blob_name=bu.blob_name_(file_destination, args.batch_id, file_type),
+            source_object=source_object,
+            bucket_name=args.bucket,
+            common_log=True
             )
-            lg.lp_info(f'Uploading common log')
-            common_log_("bucket_upload", f'{args.file_name} as {file_type}')
     elif path.is_dir(): # folder
         lg.lp_info(f'Scanning contents of directory {args.file_name}')
         for p in path.rglob("*"):
@@ -72,16 +88,19 @@ def bucket_upload(args):
                 "type" : "file",
                 "data" : child_source_path
             }
-            lg.lp_info(f'Uploading {child_source_path} to {child_destination_path}')
-            if not args.preview:
-                upload_(
-                    child_destination_path,
-                    source_object=source_object,
-                    bucket_name=args.bucket
-                )
+            preview_or_action(
+                preview=args.preview,
+                source=child_source_path,
+                destination=child_destination_path,
+                destination_blob_name=child_destination_path,
+                source_object=source_object,
+                bucket_name=args.bucket,
+                common_log=False
+            )
+        # perform a final common log action after loop
         if not args.preview:
             lg.lp_info(f'Uploading common log')
-            common_log_("bucket_upload", f'Uploaded all files from path walk at {args.file_name}')        
+            bu.common_log_("bucket_upload", f'Uploaded all files from path walk at {args.file_name}')        
     else: # not valid?
         lg.lp_error(f'{FileNotFoundError(args.file_name)}')
 
@@ -93,9 +112,9 @@ arg_parser = argparse.ArgumentParser(
     epilog = "See Also bucket_downLoad -h"
 )
 arg_parser.add_argument("-f", "--file-name", required=True, help="File or folder to upload. Supported types: csv, json, txt")
-arg_parser.add_argument("-b", "--bucket", default=BUCKET_NAME, help="Destination bucket")
+arg_parser.add_argument("-b", "--bucket", default=env.BUCKET_NAME, help="Destination bucket")
 arg_parser.add_argument("-d", "--destination-folder", default="/")
-arg_parser.add_argument("-g", "--logging-bucket", default=LOGGING_BUCKET_NAME, help="Logging bucket")
+arg_parser.add_argument("-g", "--logging-bucket", default=env.LOGGING_BUCKET_NAME, help="Logging bucket")
 arg_parser.add_argument("-p", "--preview", action="store_true", help="Preview file destinations")
 arg_parser.add_argument(
     "-v", "--version",

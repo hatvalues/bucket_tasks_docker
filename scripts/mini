@@ -1,9 +1,11 @@
-from standard_logging import StandardLogger
+#!/usr/local/bin/python3
+
+import helpers.file_utilities as utils
 import argparse
 import sys
 
 def mini(args):
-    lg = StandardLogger(arg_parser.prog)
+    lg = utils.StandardLogger(arg_parser.prog)
     if args.clear_log:
         lg.clear_log()
     lg.lp_info("LOGGER OPENED")
@@ -23,7 +25,7 @@ arg_parser = argparse.ArgumentParser(
     epilog = "See Also mini_cli -h"
 )
 arg_parser.add_argument(
-    "v", "--version",
+    "-v", "--version",
     action='version',
     version='1.0.0'
 )

@@ -1,3 +1,4 @@
+import csv
 import os
 from datetime import datetime
 import logging
@@ -16,7 +17,7 @@ class StandardLogger():
     """
     def __init__(self, process_name):
         # standardise all logging of processes
-        self.log_dir = os.getenv("LOG_LOCATION") or "logs"
+        self.log_dir = os.getenv("LOG_LOCATION") or "/tmp"
         if not os.path.isdir(self.log_dir):
             os.mkdir(self.log_dir)
         self.log_file = f'{self.log_dir}/{process_name}.log'
@@ -58,3 +59,29 @@ class StandardLogger():
         self.log_print("warning", msg, to_screen)
     def lp_error(self, msg, to_screen=True):
         self.log_print("error", msg, to_screen)
+
+def preproc_csv(file_name : str, header_row=0):
+    """Convenience function for csv file.
+    
+    Parameters
+    ----------
+    file_name : str
+        Path to file
+    header_row : int
+        Where to find the headers (zero if none). Will skip prior rows.
+
+    Returns
+    -------
+    List of dict (headers) or list of list (no headers)
+    
+    """
+    if header_row:
+        with open(file_name, "r") as f:
+            for _ in range(header_row):
+                headers = next(f).strip().split(",")
+            data = []
+            for row in csv.DictReader(f, fieldnames=headers):
+                data.append(row)
+        return data
+    else: # no headers
+        pass
