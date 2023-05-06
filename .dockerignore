@@ -5,6 +5,10 @@ archive
 logs/*
 **/*.pickle
 .gitignore
+Dockerfile
+docker_run.txt
+LICENSE
+README.md
 
 # prevent file locks if RStudio open
 .Rproj.user
