@@ -2,6 +2,9 @@
 
 A Docker container for running generic upload/download tasks against GCP Cloud Storage
 
+## to do
+Update the logging based on [this video](https://www.youtube.com/watch?v=9L77QExPmI0)
+
 ### Usage
 
 #### CLI bucket_upload
